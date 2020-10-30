@@ -3,5 +3,7 @@
     "banana": "banana",
     "grape": "grape",
     "melon": "melon",
-    "number": 12
+    "number": 12,
+    "onlyA" : "only a",
+    "aaa": "aaaaa"
 }

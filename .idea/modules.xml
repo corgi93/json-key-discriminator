@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/json-key-discriminator.iml" filepath="$PROJECT_DIR$/.idea/json-key-discriminator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../maxwork-remote-front/.idea/maxwork-remote-front.iml" filepath="$PROJECT_DIR$/../maxwork-remote-front/.idea/maxwork-remote-front.iml" />
     </modules>
   </component>
 </project>

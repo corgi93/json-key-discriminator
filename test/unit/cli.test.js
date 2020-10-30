@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 var LANG_EN = require('../../exam/lang-en.json');
 var LANG_KR = require('../../exam/lang-kr.json');
 
@@ -25,7 +27,7 @@ describe('read JSON file & extra key values and push array', () => {
 		}
 
 		expect(keyArray).toEqual(
-			['apple', 'banana' , 'grape', 'melon' , 'number']
+			['apple', 'banana' , 'grape', 'melon' , 'number', "onlyB"]
 		)
 	})
 })
@@ -64,8 +66,21 @@ describe('compare key value in extracted two arrays', () => {
 	})
 })
 
-describe('출력 테스트' , () => {
-	it('should print compared array', () => {
-
+describe('read file name' , () => {
+	it('should return JSON file name', () => {
+		const dirPath = path.join(__dirname , "exam");
+		expect(dirPath).toEqual('C:\\Users\\gurwl\\workspace\\json-key-discriminator\\test\\unit\\exam');
 	})
+
+	it('should return root path', () => {
+		const root = process.cwd();
+		expect(root).toBe('C:\\Users\\gurwl\\workspace\\json-key-discriminator')
+	})
+
+	it('should read JSON file by String and parsing to JSON', () => {
+		const filePath = "C:\\Users\\gurwl\\workspace\\json-key-discriminator\\exam\\test.json";
+		var readData;
+		readData = JSON.parse(fs.readFileSync(filePath).toString('utf-8'));
+		expect(readData).toEqual({"t1": "test1", "t2": "test2", "t3": "test3"})
+	});
 })
