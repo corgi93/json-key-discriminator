@@ -84,3 +84,21 @@ describe('read file name' , () => {
 		expect(readData).toEqual({"t1": "test1", "t2": "test2", "t3": "test3"})
 	});
 })
+
+describe('validation check', () => {
+	it('should return true when json file exist in folder' , () => {
+		const dirJsonFiles = ['test.json' , 'test1.json' , 'test3.json'];
+		function checkHasFileInFolder (dirJsonFiles , fileName){
+			let addFormatFileName = fileName.concat('.json');
+			let check = false;
+			for (const el of dirJsonFiles) {
+				if(addFormatFileName === el){
+					check = true;
+				}
+			}
+			return check;
+		}
+
+		expect(checkHasFileInFolder(dirJsonFiles, 'test3')).toEqual(true);
+	})
+})

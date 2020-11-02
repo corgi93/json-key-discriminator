@@ -3,13 +3,16 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
+    "bin" : {
+        "jkd" : "bin/jkd"
+    },
     "scripts": {
         "start": "node ./dist/cli.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "babel src -d dist",
         "jest": "jest --colors --watchAll"
     },
-    "author": "",
+    "author": "corgi93",
     "license": "ISC",
     "dependencies": {
         "chalk": "^4.1.0",
@@ -20,5 +23,9 @@
         "@babel/cli": "^7.12.1",
         "@babel/core": "^7.12.3",
         "@babel/preset-env": "^7.12.1"
+    },
+    "repository": {
+        "type" : "git",
+        "url" : "https://github.com/corgi93/json-key-discriminator.git"
     }
 }

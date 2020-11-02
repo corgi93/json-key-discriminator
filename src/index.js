@@ -8,13 +8,25 @@ let bothContainArray = []; // apple , banana, grape , melon , number
 let onlyInMain = []; // main
 let onlyInCompare = [];
 
-function extractKeyValues (jsonfile) {
+function extractKeyValues (jsonFile) {
 	let keyArray = [];
-	for (let key in jsonfile) {
+	for (let key in jsonFile) {
 		keyArray.push(key);
 	}
 	return keyArray;
 }
+
+function checkHasFileInFolder (dirJsonFiles , fileName){
+	let addFormatFileName = fileName.concat('.json');
+	let check = false;
+	for (const el of dirJsonFiles) {
+		if(addFormatFileName === el){
+			check = true;
+		}
+	}
+	return check;
+}
+
 //  로컬에서 파일 패스까지를 리턴함.
 function getDirPath(folder) {
 	const root = process.cwd();
@@ -25,7 +37,7 @@ function getDirPath(folder) {
 function getJsonFiles(dirPath) {
 	// json이 있는 dirPath 가져오기. 현재  project는 exam에 json파일들 있음
 	const files = fs.readdirSync(dirPath);
-	console.log('dir path' ,dirPath);
+	// console.log('dir path' ,dirPath);
 	return files;
 }
 
@@ -44,29 +56,38 @@ function compareKeyValuesArray(mainArray , compareArray) {
 }
 
 // chalk로 highlight
-function printDifference(  mainFileName, compareFileName ,mainArray, compareArray){
+function printDifference( dirName, mainFileName, compareFileName ,mainArray, compareArray){
 	console.log('--- compare two json key ---');
 	mainArray.forEach(el => {
-		console.log( `it's a key value only in` ,chalk.blue(`${mainFileName}.json`), chalk.red(el));
+		console.log( `it's a key value only in ${dirName}/`.concat(chalk.blue(`${mainFileName}.json`)), chalk.red(el));
 	});
 
 	compareArray.forEach(el => {
-		console.log( `it's a key value only in` ,chalk.green(`${compareFileName}.json`), chalk.red(el));
+		console.log( `it's a key value only in ${dirName}/`.concat(chalk.green(`${compareFileName}.json`)) , chalk.red(el));
 	})
 }
 
-function start(){
-	let dirPath = getDirPath('exam');
+export function start(  dirName, mainFileName, compareFileName ){
+	let dirPath = getDirPath(dirName);
 	let dirJsonFiles = getJsonFiles(dirPath);
-	let mainFileName = 'test';
-	let compareFileName = 'lang-en';
+	let hasMainFileInFolder = checkHasFileInFolder(dirJsonFiles , mainFileName);
+	let hasCompareFileInFolder = checkHasFileInFolder(dirJsonFiles , compareFileName);
+	let mainArray;
+	let compareArray;
 
-	// 하나만 읽을 수 있는 함수로 변경.
-	let mainArray = extractKeyValues(readFile(dirJsonFiles , dirPath, mainFileName));
-	let compareArray = extractKeyValues(readFile(dirJsonFiles , dirPath, compareFileName));
+	if(!hasMainFileInFolder){
+		console.error(chalk.red(`${dirName}/${mainFileName}.json이 폴더에 없습니다. json파일 이름을 정확히 입력해주세요`))
+	}else{
+		mainArray = extractKeyValues(readFile(dirJsonFiles , dirPath, mainFileName));
+	}
+	if(!hasCompareFileInFolder){
+		console.error(chalk.red(`${dirName}/${compareFileName}.json이 폴더에 없습니다. json파일 이름을 정확히 입력해주세요`))
+	}else{
+		compareArray = extractKeyValues(readFile(dirJsonFiles , dirPath, compareFileName));
+	}
 
-	compareKeyValuesArray( mainArray , compareArray );
-	printDifference( mainFileName , compareFileName ,onlyInMain , onlyInCompare );
+	if(hasMainFileInFolder && hasCompareFileInFolder){
+		compareKeyValuesArray( mainArray , compareArray );
+		printDifference(dirName ,mainFileName , compareFileName , onlyInMain , onlyInCompare );
+	}
 }
-
-start();

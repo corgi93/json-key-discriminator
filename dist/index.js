@@ -1,5 +1,10 @@
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.start = start;
+
 var _fs = _interopRequireDefault(require("fs"));
 
 var _path = _interopRequireDefault(require("path"));
@@ -10,21 +15,50 @@ var _readline = _interopRequireDefault(require("readline"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-// extract key values
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 var bothContainArray = []; // apple , banana, grape , melon , number
 
 var onlyInMain = []; // main
 
 var onlyInCompare = [];
 
-function extractKeyValues(jsonfile) {
+function extractKeyValues(jsonFile) {
   var keyArray = [];
 
-  for (var key in jsonfile) {
+  for (var key in jsonFile) {
     keyArray.push(key);
   }
 
   return keyArray;
+}
+
+function checkHasFileInFolder(dirJsonFiles, fileName) {
+  var addFormatFileName = fileName.concat('.json');
+  var check = false;
+
+  var _iterator = _createForOfIteratorHelper(dirJsonFiles),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var el = _step.value;
+
+      if (addFormatFileName === el) {
+        check = true;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return check;
 } //  로컬에서 파일 패스까지를 리턴함.
 
 
@@ -36,9 +70,9 @@ function getDirPath(folder) {
 
 function getJsonFiles(dirPath) {
   // json이 있는 dirPath 가져오기. 현재  project는 exam에 json파일들 있음
-  var files = _fs["default"].readdirSync(dirPath);
+  var files = _fs["default"].readdirSync(dirPath); // console.log('dir path' ,dirPath);
 
-  console.log('dir path', dirPath);
+
   return files;
 }
 
@@ -61,26 +95,38 @@ function compareKeyValuesArray(mainArray, compareArray) {
 } // chalk로 highlight
 
 
-function printDifference(mainFileName, compareFileName, mainArray, compareArray) {
+function printDifference(dirName, mainFileName, compareFileName, mainArray, compareArray) {
   console.log('--- compare two json key ---');
   mainArray.forEach(function (el) {
-    console.log("it's a key value only in", _chalk["default"].blue("".concat(mainFileName, ".json")), _chalk["default"].red(el));
+    console.log("it's a key value only in ".concat(dirName, "/").concat(_chalk["default"].blue("".concat(mainFileName, ".json"))), _chalk["default"].red(el));
   });
   compareArray.forEach(function (el) {
-    console.log("it's a key value only in", _chalk["default"].green("".concat(compareFileName, ".json")), _chalk["default"].red(el));
+    console.log("it's a key value only in ".concat(dirName, "/").concat(_chalk["default"].green("".concat(compareFileName, ".json"))), _chalk["default"].red(el));
   });
 }
 
-function start() {
-  var dirPath = getDirPath('exam');
+function start(dirName, mainFileName, compareFileName) {
+  var dirPath = getDirPath(dirName);
   var dirJsonFiles = getJsonFiles(dirPath);
-  var mainFileName = 'test';
-  var compareFileName = 'lang-en'; // 하나만 읽을 수 있는 함수로 변경.
+  var hasMainFileInFolder = checkHasFileInFolder(dirJsonFiles, mainFileName);
+  var hasCompareFileInFolder = checkHasFileInFolder(dirJsonFiles, compareFileName);
+  var mainArray;
+  var compareArray;
 
-  var mainArray = extractKeyValues(readFile(dirJsonFiles, dirPath, mainFileName));
-  var compareArray = extractKeyValues(readFile(dirJsonFiles, dirPath, compareFileName));
-  compareKeyValuesArray(mainArray, compareArray);
-  printDifference(mainFileName, compareFileName, onlyInMain, onlyInCompare);
+  if (!hasMainFileInFolder) {
+    console.error(_chalk["default"].red("".concat(dirName, "/").concat(mainFileName, ".json\uC774 \uD3F4\uB354\uC5D0 \uC5C6\uC2B5\uB2C8\uB2E4. json\uD30C\uC77C \uC774\uB984\uC744 \uC815\uD655\uD788 \uC785\uB825\uD574\uC8FC\uC138\uC694")));
+  } else {
+    mainArray = extractKeyValues(readFile(dirJsonFiles, dirPath, mainFileName));
+  }
+
+  if (!hasCompareFileInFolder) {
+    console.error(_chalk["default"].red("".concat(dirName, "/").concat(compareFileName, ".json\uC774 \uD3F4\uB354\uC5D0 \uC5C6\uC2B5\uB2C8\uB2E4. json\uD30C\uC77C \uC774\uB984\uC744 \uC815\uD655\uD788 \uC785\uB825\uD574\uC8FC\uC138\uC694")));
+  } else {
+    compareArray = extractKeyValues(readFile(dirJsonFiles, dirPath, compareFileName));
+  }
+
+  if (hasMainFileInFolder && hasCompareFileInFolder) {
+    compareKeyValuesArray(mainArray, compareArray);
+    printDifference(dirName, mainFileName, compareFileName, onlyInMain, onlyInCompare);
+  }
 }
-
-start();
