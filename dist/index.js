@@ -11,8 +11,6 @@ var _path = _interopRequireDefault(require("path"));
 
 var _chalk = _interopRequireDefault(require("chalk"));
 
-var _readline = _interopRequireDefault(require("readline"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
@@ -62,21 +60,20 @@ function checkHasFileInFolder(dirJsonFiles, fileName) {
 } //  로컬에서 파일 패스까지를 리턴함.
 
 
-function getDirPath(folder) {
+function getDirPath(folderName) {
   var root = process.cwd();
-  return _path["default"].join(root, folder);
+  return _path["default"].join(root, folderName);
 } // 사용자들의 json파일들 array return
 
 
 function getJsonFiles(dirPath) {
   // json이 있는 dirPath 가져오기. 현재  project는 exam에 json파일들 있음
-  var files = _fs["default"].readdirSync(dirPath); // console.log('dir path' ,dirPath);
-
+  var files = _fs["default"].readdirSync(dirPath);
 
   return files;
 }
 
-function readFile(jsonFiles, dirPath, readFile) {
+function readFile(dirPath, readFile) {
   var readFilePath = dirPath.concat('\\' + readFile + '.json');
   return JSON.parse(_fs["default"].readFileSync(readFilePath).toString('utf-8'));
 }
@@ -105,28 +102,46 @@ function printDifference(dirName, mainFileName, compareFileName, mainArray, comp
   });
 }
 
+function checkHasFolderInRoot(inputFileName) {
+  var root = process.cwd();
+  var rootFiles = getJsonFiles(root);
+  var isRightFileName = false;
+  rootFiles.forEach(function (file) {
+    if (file === inputFileName) {
+      isRightFileName = true;
+    }
+  });
+  return isRightFileName;
+}
+
 function start(dirName, mainFileName, compareFileName) {
-  var dirPath = getDirPath(dirName);
-  var dirJsonFiles = getJsonFiles(dirPath);
-  var hasMainFileInFolder = checkHasFileInFolder(dirJsonFiles, mainFileName);
-  var hasCompareFileInFolder = checkHasFileInFolder(dirJsonFiles, compareFileName);
-  var mainArray;
-  var compareArray;
+  var hasFolderInRoot = checkHasFolderInRoot(dirName);
 
-  if (!hasMainFileInFolder) {
-    console.error(_chalk["default"].red("".concat(dirName, "/").concat(mainFileName, ".json\uC774 \uD3F4\uB354\uC5D0 \uC5C6\uC2B5\uB2C8\uB2E4. json\uD30C\uC77C \uC774\uB984\uC744 \uC815\uD655\uD788 \uC785\uB825\uD574\uC8FC\uC138\uC694")));
+  if (!hasFolderInRoot) {
+    console.error(_chalk["default"].red("".concat(dirName, " is not in root... Please enter folder name in root!")));
   } else {
-    mainArray = extractKeyValues(readFile(dirJsonFiles, dirPath, mainFileName));
-  }
+    var dirPath = getDirPath(dirName);
+    var dirJsonFiles = getJsonFiles(dirPath);
+    var hasMainFileInFolder = checkHasFileInFolder(dirJsonFiles, mainFileName);
+    var hasCompareFileInFolder = checkHasFileInFolder(dirJsonFiles, compareFileName);
+    var mainArray;
+    var compareArray;
 
-  if (!hasCompareFileInFolder) {
-    console.error(_chalk["default"].red("".concat(dirName, "/").concat(compareFileName, ".json\uC774 \uD3F4\uB354\uC5D0 \uC5C6\uC2B5\uB2C8\uB2E4. json\uD30C\uC77C \uC774\uB984\uC744 \uC815\uD655\uD788 \uC785\uB825\uD574\uC8FC\uC138\uC694")));
-  } else {
-    compareArray = extractKeyValues(readFile(dirJsonFiles, dirPath, compareFileName));
-  }
+    if (!hasMainFileInFolder) {
+      console.error(_chalk["default"].red("".concat(dirName, "/").concat(mainFileName, ".json is not in the folder. Please enter json file name correctly.")));
+    } else {
+      mainArray = extractKeyValues(readFile(dirPath, mainFileName));
+    }
 
-  if (hasMainFileInFolder && hasCompareFileInFolder) {
-    compareKeyValuesArray(mainArray, compareArray);
-    printDifference(dirName, mainFileName, compareFileName, onlyInMain, onlyInCompare);
+    if (!hasCompareFileInFolder) {
+      console.error(_chalk["default"].red("".concat(dirName, "/").concat(compareFileName, ".json is not in the folder. Please enter json file name correctly.")));
+    } else {
+      compareArray = extractKeyValues(readFile(dirPath, compareFileName));
+    }
+
+    if (hasMainFileInFolder && hasCompareFileInFolder) {
+      compareKeyValuesArray(mainArray, compareArray);
+      printDifference(dirName, mainFileName, compareFileName, onlyInMain, onlyInCompare);
+    }
   }
 }

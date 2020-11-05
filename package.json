@@ -1,6 +1,6 @@
 {
     "name": "json-key-discriminator",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "",
     "main": "index.js",
     "bin" : {
@@ -10,7 +10,8 @@
         "start": "node ./dist/cli.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "babel src -d dist",
-        "jest": "jest --colors --watchAll"
+        "jest": "jest --colors --watchAll",
+        "prepublish": "npm run build"
     },
     "author": "corgi93",
     "license": "ISC",
@@ -27,5 +28,9 @@
     "repository": {
         "type" : "git",
         "url" : "https://github.com/corgi93/json-key-discriminator.git"
-    }
+    },
+    "keywords": [
+        "json key",
+        "node"
+    ]
 }

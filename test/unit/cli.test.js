@@ -101,4 +101,29 @@ describe('validation check', () => {
 
 		expect(checkHasFileInFolder(dirJsonFiles, 'test3')).toEqual(true);
 	})
+	const root = process.cwd();
+	const files = fs.readdirSync(root);
+
+	function checkHasFileInRoot(rootFiles , inputFileName){
+		let isRightFileName = false;
+		files.forEach(file => {
+			if(file === inputFileName){
+				isRightFileName = true
+			}
+		})
+		return isRightFileName;
+	}
+
+	it('should return root files array.', () => {
+		expect(files).toEqual([".babelrc", ".git", ".gitignore", ".idea", ".npmignore", "bin", "dist", "exam", "node_modules", "package-lock.json", "package.json", "README.md", "src", "test"])
+
+	})
+
+	it('should return true when input file has in root files array' , () => {
+		expect(checkHasFileInRoot( files, 'exam' )).toEqual(true);
+	})
+
+	it('should return false when input file has in root files array' , () => {
+		expect(checkHasFileInRoot( files, 'wrongFileName' )).toEqual(false);
+	})
 })
